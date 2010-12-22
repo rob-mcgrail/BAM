@@ -1,0 +1,20 @@
+#output {
+    background-color: black;
+    font-family: Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
+    color: yellow;
+}
+
+#output > p {
+    margin: 1em;
+}
+
+h1, h2 {
+	font-family: helvetica, arial, sans-serif;
+}
+
+h2 a, h2 a:visited {
+	color: black;
+}
+
+h2 a:hover { color: yellow; background-color: black}
+
