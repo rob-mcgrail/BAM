@@ -1,63 +1,8 @@
-So you run BAM! yourscript.rb
+Better seperation of instances.
 
-And it opens mongerel, and tells you it's there.
+Change CLI arguments for hosted scripts after launch
 
-So you click run.
+Upload files for scripts
 
-
-
-
-Simpler version of BAM - you just give it a command, and it runs it with backticks, grabs output, and posts that
-on a server.
-
-If you leave comments, it will print them from mongrel's output
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Bam! Lets you deploy a ruby script to a server for others to use.
-
-It basically routes I-O through javascript. It is very insecure, but you only allow certain commands...
-
-HOW TO GET TEXT FROM SCREEN TO THE TERMINAL
-
-
----there's a single button for run
-
-then every subsequent thing is either a gets or a puts
-
-except for output files, which can go to a public directory.
-
-
-
------------------
-
-Script - includes the argument script.
-
-Then it creates an html page - title of script, comments, etc.
-
-Then it has a button that sends a special request, which mongerel handles as a run command.
-
-Then the browser requests every second for "thing.txt", which mongerel populates with STDOUT.
-
-Files go in /pubic
-
-Everything works. But can I send my string to mongerel, and have it go to gets?
-JUST have a say box there the whole time.
-
-Can I overload gets to do something that mongerel will understand, and then push off to the ajax - ie making the input box
-highlighted or visible?
+Serve file output from scripts
 
