@@ -1,75 +1,71 @@
 require 'rubygems'
 require 'mongrel'
-require 'stringio'
 
-PUBLIC = 'resources/public'
-HOST = '0.0.0.0'
-PORT = 5000
-SCRIPT = 'hello.rb'
 
 class Server
 
   class Home < Mongrel::HttpHandler
+
+    def initialize
+      @index = View.new
+      super
+    end
+
     def process(request, response)
       response.start(200) do |head, out|
         head["Content-Type"] = "text/html"
-        out.write Views.index_html
+        out.write @index.html
       end
     end
   end
 
+
   class Start < Mongrel::HttpHandler
+
+    def initialize
+      super
+      @script_instance = Runner.new(SCRIPT_PATH, SCRIPT)
+    end
+
     def process(request, response)
-      if $running == true
+      if @script_instance.runner == true
         response.start(200) do |head, out|
           head["Content-Type"] = "text/html"
-          out.write "<p>$ ruby #{@script} is already running!</p>"
+          out.write "<p>$ ruby #{SCRIPT} is already running!</p>"
         end
       else
-
-        $buffer = StringIO.new
-
-        @script = SCRIPT
-        @path = File.expand_path(File.dirname(__FILE__)) + '/../'
-        @script_path = @path + @script
-
-        $buffer << "<p>$ ruby #{@script}</p>"
-
-        cmd = %Q<ruby #{@script_path}>
-
-        $running = true
-        IO.popen(cmd, 'w+') do |subprocess|
-          subprocess.write("Starting script")
-          subprocess.close_write
-          subprocess.read.split("\n").each do |l|
-            $buffer << "<p>#{l}</p>"
-          end
-        end
-
-        $buffer << "<p>Script finished</p>"; $running = false
+        @script_instance.run #these can live in a big hash with the view id as key
 
         response.start(200) do |head, out|
             head["Content-Type"] = "text/html"
-            load @script
-            out.write "<p></p>"
         end
       end
     end
+
   end
 
   class Read < Mongrel::HttpHandler
     def process(request, response)
-      response.start(200) do |head, out|
-        head["Content-Type"] = "text/html"
-        $buffer.rewind
-        $buffer.read.each {|line| out.write line}
+      if @script_instance.runner == true
+        response.start(200) do |head, out|
+          head["Content-Type"] = "text/html"
+          @script_instance.buffer.rewind
+          @script_instance.buffer.read.each {|line| out.write line}
+        end
+      else
+        response.start(200) do |head, out|
+          head["Content-Type"] = "text/html"
+        end
       end
     end
   end
 
   def self.start
-    $buffer = StringIO.new
     $stdout.sync = true
+
+#
+# What about a unique hash for start? It could match that against read somehow?
+#
 
     config = Mongrel::Configurator.new :host => HOST, :port => PORT do
       listener do
@@ -83,10 +79,18 @@ class Server
       run
     end
 
-    puts 'BAM!'.red_on_white
-    puts "Visit #{NetTools.local_ip}:#{PORT} (or '#{HOST}:#{PORT}' on local machine)".white_on_green
+    self.intro
 
     config.join
+  end
+
+  def self.intro
+    puts 'BAM!'.red_on_white
+    begin
+      puts "Visit #{NetTools.local_ip}:#{PORT} (or '#{HOST}:#{PORT}' on local machine)".white_on_green
+    rescue
+      puts "I can't tell you what your ip is, but locally I'm' '#{HOST}:#{PORT}'".green_on_white
+    end
   end
 
 end
