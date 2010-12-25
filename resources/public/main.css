@@ -1,7 +1,7 @@
 #output {
     background-color: black;
     font-family: Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
-    color: yellow;
+    color: white;
 }
 
 #output > p {
@@ -16,5 +16,8 @@ h2 a, h2 a:visited {
 	color: black;
 }
 
-h2 a:hover { color: yellow; background-color: black}
+h2 a:hover {
+    color: yellow; background-color: black
+
+    }
 
