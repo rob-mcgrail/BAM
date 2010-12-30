@@ -2,12 +2,13 @@ require 'rubygems'
 require 'mongrel'
 
 class Server
-
+    
   class Home < Mongrel::HttpHandler
 
     def process(request, response)
-      key = KEY
-      instance_key = (key += 1).to_s
+      $key += 1
+      instance_key = $key.to_s
+      
       @index = View.new instance_key
       ScriptInstances.spawn instance_key
       
