@@ -7,3 +7,5 @@ Serve file output from scripts
 Color options
 
 Put the instance key logic somewhere better -> possibly in ScriptInstances
+
+Let windows users know this wont work
