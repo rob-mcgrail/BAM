@@ -1,19 +1,15 @@
 class View
   require 'builder'
-  attr_reader :hash
-  @@id = 0
+  attr_reader :instance_key
+
   JS = 'public/plainjax.js'
   STYLESHEET = 'public/main.css'
   SCRIPTNAME = 'hello.rb'
-  SPEED = '300'
+  SPEED = '100'
 
-  def self.new_session
 
-  end
-
-  def initialize
-    @@id += 1
-    @instance_id = @@id
+  def initialize(key)
+    @instance_key = key
   end
 
   def html
@@ -38,7 +34,7 @@ class View
            }
 
             function requestOutput() {
-              plainajax.request('respurl: read?#{@instance_id}; resultloc: output;')
+              plainajax.request('respurl: read?#{@instance_key}; resultloc: output;')
            }
 
             function showOutput(text) {
@@ -47,7 +43,7 @@ class View
            }
 
             function runScript() {
-              plainajax.request('respurl: start?#{@instance_id}; resultloc: metamessage;')
+              plainajax.request('respurl: start?#{@instance_key}; resultloc: metamessage;')
            }"
 
 
@@ -71,10 +67,11 @@ class View
         @h.div("id" => "output"){
 
         }
-        @h.button("Run Script", "type" => "button", "onclick" => "runScript(); requestLoop();")
+        # @h.button("Run Script", "type" => "button", "onclick" => "runScript(); requestLoop();")
         @h.div("id" => "metamessage"){
 
         }
+        @h.p("My instance key is #{@instance_key}")
       }
     }
 
