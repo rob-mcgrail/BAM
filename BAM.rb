@@ -15,7 +15,7 @@ HOST = '0.0.0.0'
 
 PORT = 5000
 
-KEY = Time.now.to_i
+$key = Time.now.to_i
 
 $:.unshift PATH
 require 'helpers/colourize.rb'
