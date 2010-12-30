@@ -1,8 +1,9 @@
-Better seperation of instances.
-
 Change CLI arguments for hosted scripts after launch
 
 Upload files for scripts
 
 Serve file output from scripts
 
+Color options
+
+Put the instance key logic somewhere better -> possibly in ScriptInstances
