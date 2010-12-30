@@ -1,17 +1,16 @@
 require 'rubygems'
 require 'mongrel'
 
-
 class Server
 
   class Home < Mongrel::HttpHandler
 
-    def initialize
-      @index = View.new
-      super
-    end
-
     def process(request, response)
+      key = KEY
+      instance_key = (key += 1).to_s
+      @index = View.new instance_key
+      ScriptInstances.spawn instance_key
+      
       response.start(200) do |head, out|
         head["Content-Type"] = "text/html"
         out.write @index.html
@@ -22,50 +21,53 @@ class Server
 
   class Start < Mongrel::HttpHandler
 
-    def initialize
-      super
-      @script_instance = Runner.new(SCRIPT_PATH, SCRIPT)
-    end
-
     def process(request, response)
-      if @script_instance.runner == true
-        response.start(200) do |head, out|
-          head["Content-Type"] = "text/html"
-          out.write "<p>$ ruby #{SCRIPT} is already running!</p>"
+      instance_key = request.params["QUERY_STRING"].split('&').first
+      
+      if ScriptInstances.has? instance_key
+        if ScriptInstances.is_running? instance_key
+          response.start(200) do |head, out|
+            head["Content-Type"] = "text/html"
+            out.write "<p>$ ruby #{SCRIPT} is already running!</p>"
+          end
+        else
+          ScriptInstances.flush instance_key
+          ScriptInstances.run instance_key
+          response.start(200) do |head, out|
+              head["Content-Type"] = "text/html"
+          end
         end
       else
-        @script_instance.run #these can live in a big hash with the view id as key
+        response.start(200) do |head, out|
+            head["Content-Type"] = "text/html"
+            out.write "<p>I seem to be a page generated for an old instance of BAM!</p><p>Try refreshing me (F5)"
+        end
+      end
+    end
 
+  end
+
+#this doesn't need a conditoinal at all I think:
+
+  class Read < Mongrel::HttpHandler
+    def process(request, response)
+      instance_key = request.params["QUERY_STRING"].split('&').first
+      
+      if ScriptInstances.has? instance_key
+        response.start(200) do |head, out|
+          head["Content-Type"] = "text/html"
+          ScriptInstances.buffer(instance_key).rewind
+          ScriptInstances.buffer(instance_key).read.each {|line| out.write line}
+        end
+      else
         response.start(200) do |head, out|
             head["Content-Type"] = "text/html"
         end
       end
     end
-
   end
-
-  class Read < Mongrel::HttpHandler
-    def process(request, response)
-      if @script_instance.runner == true
-        response.start(200) do |head, out|
-          head["Content-Type"] = "text/html"
-          @script_instance.buffer.rewind
-          @script_instance.buffer.read.each {|line| out.write line}
-        end
-      else
-        response.start(200) do |head, out|
-          head["Content-Type"] = "text/html"
-        end
-      end
-    end
-  end
-
+  
   def self.start
-    $stdout.sync = true
-
-#
-# What about a unique hash for start? It could match that against read somehow?
-#
 
     config = Mongrel::Configurator.new :host => HOST, :port => PORT do
       listener do
