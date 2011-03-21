@@ -12,7 +12,6 @@ require 'mongrel'
 # start the Runner, and read and write to its buffer object, using urls like /read?instance_key_integer
 
 class Server
-
   class Home < Mongrel::HttpHandler
 
     # Starts a new Runner (ScriptInstances#spawn) with a unique instance_key
@@ -61,8 +60,8 @@ class Server
         end
       end
     end
-
   end
+
 
   class Read < Mongrel::HttpHandler
 
