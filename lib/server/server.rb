@@ -97,7 +97,7 @@ class Server
       else
         response.start(200) do |head, out|
             head["Content-Type"] = "text/html"
-            out.write "<p>I seem to be a page generated for an old instance of BAM!</p><p>Try refreshing me (F5)"
+            out.write "<p>I seem to be a page generated for an old instance of BAM!</p><p>Try refreshing me (F5)</p>"
         end
       end
     end
