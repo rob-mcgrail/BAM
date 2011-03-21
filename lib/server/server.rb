@@ -2,16 +2,16 @@ require 'rubygems'
 require 'mongrel'
 
 class Server
-    
+
   class Home < Mongrel::HttpHandler
 
     def process(request, response)
       $key += 1
       instance_key = $key.to_s
-      
+
       @index = View.new instance_key
       ScriptInstances.spawn instance_key
-      
+
       response.start(200) do |head, out|
         head["Content-Type"] = "text/html"
         out.write @index.html
@@ -24,7 +24,7 @@ class Server
 
     def process(request, response)
       instance_key = request.params["QUERY_STRING"].split('&').first
-      
+
       if ScriptInstances.has? instance_key
         if ScriptInstances.is_running? instance_key
           response.start(200) do |head, out|
@@ -48,12 +48,10 @@ class Server
 
   end
 
-#this doesn't need a conditoinal at all I think:
-
   class Read < Mongrel::HttpHandler
     def process(request, response)
       instance_key = request.params["QUERY_STRING"].split('&').first
-      
+
       if ScriptInstances.has? instance_key
         response.start(200) do |head, out|
           head["Content-Type"] = "text/html"
@@ -67,7 +65,26 @@ class Server
       end
     end
   end
-  
+
+  class Write < Mongrel::HttpHandler
+    def process(request, response)
+      instance_key = request.params["QUERY_STRING"].split('&').first
+      string = request.params["QUERY_STRING"].split('&')[1]
+
+      if ScriptInstances.has? instance_key
+        response.start(200) do |head, out|
+          head["Content-Type"] = "text/html"
+          ScriptInstances.write(instance_key, string)
+        end
+      else
+        response.start(200) do |head, out|
+            head["Content-Type"] = "text/html"
+            out.write "<p>I seem to be a page generated for an old instance of BAM!</p><p>Try refreshing me (F5)"
+        end
+      end
+    end
+  end
+
   def self.start
 
     config = Mongrel::Configurator.new :host => HOST, :port => PORT do
@@ -75,6 +92,7 @@ class Server
         uri "/",                :handler => Home.new
         uri "/start",           :handler => Start.new
         uri "/read",            :handler => Read.new
+        uri "/write",           :handler => Write.new
         uri "/public",          :handler => Mongrel::DirHandler.new(PUBLIC)
       end
 

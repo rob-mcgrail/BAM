@@ -1,4 +1,5 @@
 Change CLI arguments for hosted scripts after launch
+But teach it to respect arguments, before making arguments costomizable.
 
 Upload files for scripts
 
@@ -9,3 +10,8 @@ Color options
 Put the instance key logic somewhere better -> possibly in ScriptInstances
 
 Let windows users know this wont work
+
+Use Forwardable in the wrapper for the instances hash, rather than what you have now...
+
+Think about whether or not the observer pattern works well for input
+

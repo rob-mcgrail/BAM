@@ -2,12 +2,6 @@ class View
   require 'builder'
   attr_reader :instance_key
 
-  JS = 'public/plainjax.js'
-  STYLESHEET = 'public/main.css'
-  SCRIPTNAME = 'hello.rb'
-  SPEED = '100'
-
-
   def initialize(key)
     @instance_key = key
   end
@@ -56,13 +50,13 @@ class View
         @h.script("type" => "text/javascript"){
           @index_html << @js # Putting the javascript functions right in
         }
-        @h.title("BAM! - #{SCRIPTNAME}")
+        @h.title("BAM! - #{SCRIPT}")
       }
 
       @h.body{
         @h.h1("BAM!")
         @h.h2{
-          @h.a("Run #{SCRIPTNAME}", "href" => "#RUN", "onclick" => "runScript(); requestLoop();")
+          @h.a("Run #{SCRIPT}", "href" => "#RUN", "onclick" => "runScript(); requestLoop();")
         }
         @h.div("id" => "output"){
 
