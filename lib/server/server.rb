@@ -1,10 +1,22 @@
 require 'rubygems'
 require 'mongrel'
 
+#
+# The BAM server
+#
+# Visiting / creates a new Runner object, with a unique instance_key integer,
+# used as its key from then on to distinguish it from other runners...
+#
+#
+# The BAM 'UI' is in the @index var - it contains a number of simple ajax calls that
+# start the Runner, and read and write to its buffer object, using urls like /read?instance_key_integer
+
 class Server
 
   class Home < Mongrel::HttpHandler
 
+    # Starts a new Runner (ScriptInstances#spawn) with a unique instance_key
+    # Then creates the view with ajax calls which pass the same instance_key values
     def process(request, response)
       $key += 1
       instance_key = $key.to_s
@@ -22,6 +34,10 @@ class Server
 
   class Start < Mongrel::HttpHandler
 
+    # Starts the Runner, identifying it by an instance_key param.
+    # This is passed to ScriptInstances, which confirms the existence of the instance,
+    # its state (running, not running) and then either runs it or warns the user that they're
+    # clicking pointlessly...
     def process(request, response)
       instance_key = request.params["QUERY_STRING"].split('&').first
 
@@ -49,6 +65,9 @@ class Server
   end
 
   class Read < Mongrel::HttpHandler
+
+    # Reads from the Runner's buffer object (StringIO), identifying it by an instance_key param.
+    # Checks that runner with that key exists, rewinds the buffer, and outputs each line.
     def process(request, response)
       instance_key = request.params["QUERY_STRING"].split('&').first
 
@@ -85,6 +104,7 @@ class Server
     end
   end
 
+
   def self.start
 
     config = Mongrel::Configurator.new :host => HOST, :port => PORT do
@@ -105,6 +125,8 @@ class Server
     config.join
   end
 
+
+  # Quick output on the host's terminal, identifying the host IP on the LAN and WAN
   def self.intro
     puts 'BAM!'.red_on_white
     begin

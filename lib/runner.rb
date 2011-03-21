@@ -3,8 +3,18 @@ class Runner
   require 'pty'
   attr_reader :buffer, :running
 
-#runner should grab the key off view?
-
+  # Runners run the individual instances of the script for BAM.
+  # every runner has an instance_key integer, which is its key in the
+  # ScriptInstances hash.
+  #
+  # To interact with a runner instance, ScriptInstances methods are used, passing in
+  # the relevant instance_key...
+  #
+  # The bulk of the IO work is in the @buffer var
+  #
+  # The state of the sscript is stored in @running (bool)
+  #
+  # Both of these have accessors, which are used by methods in ScriptInstances.
   def initialize(script_path, script_name)
     @script_path = script_path
     @script_name = script_name
@@ -12,19 +22,19 @@ class Runner
     @running = false
   end
 
-
+  # Resets the buffer.
   def flush
     @buffer = StringIO.new
   end
 
-
+  # Used for user input (not a finished feature)
   def write(string)
     @input = StringIO.new
     @input = string + "\n"
     puts string
   end
 
-
+  # The key method, a work in progress - runs the script...
   def run
     @running = true
     @buffer << "<p>$ ruby #{@script_name}</p>"
