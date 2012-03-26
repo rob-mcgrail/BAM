@@ -129,7 +129,7 @@ class Server
   def self.intro
     puts 'BAM!'.red_on_white
     begin
-      puts "Visit #{NetTools.local_ip}:#{PORT} (or '#{HOST}:#{PORT}' on local machine)".white_on_green
+      puts "Visit #{NetTools.local_ip}:#{PORT} (or '#{HOST}:#{PORT}' on this machine)".white_on_green
     rescue
       puts "I can't tell you what your ip is, but locally I'm' '#{HOST}:#{PORT}'".green_on_white
     end
